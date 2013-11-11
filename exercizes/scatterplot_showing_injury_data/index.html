@@ -3,11 +3,34 @@
   <head>
     <meta charset="utf-8">
     <style type="text/css">
+    .axis path{
+      fill:none;
+      stroke:black;
+    }
+    .axis-label {
+      stroke:black;
+      font:sans-serif;
+      font-size:10pt;
+    }
+    .axis {
+      font-size:8pt;
+      font-family:sans-serif;
+    }
+    .tick{
+      fill:none;
+      stroke:black;
+    }
+    circle{
+      stroke:black;
+      stroke-width:0.5px;
+      fill:RoyalBlue;
+      opacity:0.6;
+    }
     </style>
     <script src="../../d3.v3.js"></script>
     <script>
       draw = function (data) {
-	var margin = 50,
+	var margin = 70,
 	    width = 700,
 	    height = 300;
 
@@ -51,8 +74,48 @@
 	  .attr("cy", function(d){return y_scale(d.dist_between_fail)})
 	  .attr("r", 5);
 
+        //draw axes
         var x_axis = d3.svg.axis().scale(x_scale);
 
+        //svg transform can be used to move svg elemetns
+	//translate moves elements, this translate moves 0 pixels to the
+	//right (x-axis), and height - margin down from the top
+	//the markers for the x_axis will draw inside the margin that was
+	//left under the axis after the translate
+	//the call() method actually draws teh axis
+	d3.select("svg")
+	  .append("g")
+	    .attr("class", "x axis")
+	    .attr("transform", "translate(0," + (height - margin) + ")")
+	  .call(x_axis);
+
+        var y_axis = d3.svg.axis().scale(y_scale).orient("left");
+
+        d3.select("svg")
+	  .append("g")
+	    .attr("class", "y axis")
+	    .attr("transform", "translate(" + margin +",0)") 
+	  .call(y_axis);
+
+        //adding the x axis, the positioning of the new text element
+	//is relative to the existing axis
+	d3.select(".x.axis")
+	  .append("text")
+	    .text("collisions with injury (per million miles)")
+	    .attr("x", (width / 2) - margin)
+	    .attr("y", margin / 1.5)
+	    .attr("class", "axis-label");
+
+        //adding the y axis is trickier because we need to rotate
+	//from a given point, to make it vertical, and then we move
+	//the y axis down lower on the graph
+	var transform_y_axis = "rotate (-90, -43, 0) translate(-280)"
+
+        d3.select(".y.axis")
+	  .append("text")
+	  .text("mean distance between failure (miles)")
+	  .attr("transform", transform_y_axis)
+	  .attr("class", "axis-label");
       }
     </script>
   </head>
