@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <style type="text/css">
+    </style>
+    <script src="../../d3.v3.js"></script>
+    <script>
+      draw = function (data) {
+	var margin = 50,
+	    width = 700,
+	    height = 300;
+
+        d3.select("body")
+	  .append("svg")
+	    .attr("width", width)
+	    .attr("height", height)
+	  .selectAll("circle")
+	  .data(data)
+	  .enter()
+	  .append("circle");
+
+	//determine range or our data using d3 scales
+	//before rending our circles
+	//.extent returns the minimum and maximum value accessed
+	//by the function
+	var x_extent = d3.extent(data, function(d){
+          return d.collision_with_injury;	
+	});
+
+        //using the extent of the data, generate a scale used to map
+	//data points to pixels in our acceptable range of x values
+	var x_scale = d3.scale.linear()
+	    .range([margin, width - margin])
+	    .domain(x_extent);
+
+	var y_extent = d3.extent(data, function(d){
+	  return d.dist_between_fail
+	});
+        //repeat the same process for the y_scale as for the x_scale,
+	//but notice that the y range goes from the highest y to lowest
+	//this is because in SVG, 0 y is printed at the top of the screen
+	//and higher values print lower on the page, we want the opposite
+	//in our graph
+	var y_scale = d3.scale.linear()
+	    .range([height - margin, margin])
+	    .domain(y_extent);
+
+        d3.selectAll("circle")
+	  .attr("cx", function(d){return x_scale(d.collision_with_injury)})
+	  .attr("cy", function(d){return y_scale(d.dist_between_fail)})
+	  .attr("r", 5);
+
+        var x_axis = d3.svg.axis().scale(x_scale);
+
+      }
+    </script>
+  </head>
+  <body>
+    <script>
+      d3.json("../../data/bus_perf.json", draw);
+    </script>
+  </body>
+</html>
