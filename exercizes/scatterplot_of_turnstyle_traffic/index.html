@@ -15,7 +15,7 @@
 		stroke-width:2px;
       }
       .tick {
-        fill:none
+        fill:none;
 		stroke:black;
       }
       circle{
@@ -117,6 +117,10 @@
 		var line = d3.svg.line().x( function(d){return time_scale(d.time);})
 		  .y(function(d){return count_scale(d.count);});
 
+		//here we write the paths connection our data points
+		//each path is a single line, so we don't selectAll but
+		//rather we draw one line and map all our data to it using
+		//our line draw function, and providing the relevant data
 	    d3.select("svg")
 		  .append("path")
 		    .attr("d", line(data.times_square))
@@ -126,6 +130,20 @@
 		  .append("path")
 		    .attr("d", line(data.grand_central))
 			.attr("class", "grand_central");
+
+		//now lets polish up our axis labels
+		d3.select(".y.axis")
+		  .append("text")
+		  .text("mean number of turnstile revolutions")
+		  .attr("transform", "rotate(90, "+ margin + ", 0)")
+		  .attr("x", margin * 2)
+		  .attr("y", 100);
+
+		d3.select(".x.axis")
+		  .append("text")
+		  .text("time")
+		  .attr("x", width / 1.5 - 2 * margin)
+		  .attr("y", margin);
       }
 
     </script>
